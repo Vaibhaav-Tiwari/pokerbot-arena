@@ -30,6 +30,10 @@ header.top { display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: center
 .boot { margin: 18px 0; padding: 12px 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel);
   display: flex; gap: 12px; align-items: center; font-size: 14px; color: var(--muted) }
 .boot .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--gold); animation: pulse 1s infinite alternate }
+.boot .boot-msg { display: flex; flex-direction: column; gap: 2px }
+.boot .boot-note { font-size: 12px; opacity: .75 }
+.boot.ok .boot-note, .boot.err .boot-note { display: none }
+
 .boot.ok .dot { background: var(--win); animation: none }
 .boot.err .dot { background: var(--chip); animation: none }
 @keyframes pulse { to { opacity: .3 } }
