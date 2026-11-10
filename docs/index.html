@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pokerbot Arena</title>
+<meta name="description" content="A tournament no-limit hold'em bot with ICM and opponent modeling, running live in your browser. Watch it play or sit down against it.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;600&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand"><h1>Pokerbot Arena</h1><span>by Vaibhaav Tiwari</span></div>
+    <nav class="links"><a href="https://github.com/Vaibhaav-Tiwari/pokerbot-arena">GitHub</a><a href="https://github.com/Vaibhaav-Tiwari/pokerbot-arena#readme">Write-up</a></nav>
+  </header>
+
+  <div class="hero">
+    <p>A no-limit hold'em <b>tournament bot</b> built for Deep-ML's <b>No Limit: Pokerbot Tournament</b> (8-player sit-and-gos, 1 ms per decision, 10/5/2 points with ICM at the cap). Everything below runs the <b>real Python engine and bot in your browser</b>: watch it play a full tournament, or take a seat against it.</p>
+    <div class="stats">
+      <div class="stat"><b>Top 10 / 30</b><span>entry leaderboard (house bots)</span></div>
+      <div class="stat"><b>3.3 µs</b><span>median decision (limit 1,000 µs)</span></div>
+      <div class="stat"><b>0 errors</b><span>across every contest submission</span></div>
+      <div class="stat"><b>100k+</b><span>simulated tournaments for tuning</span></div>
+    </div>
+  </div>
+
+  <div class="boot" id="boot"><span class="dot"></span><span id="bootText">Starting the Python engine in your browser…</span></div>
+
+  <nav class="tabs" role="tablist">
+    <button role="tab" aria-selected="true" data-tab="watch" id="tab-watch">Watch the bot</button>
+    <button role="tab" aria-selected="false" data-tab="play" id="tab-play">Play against it</button>
+    <button role="tab" aria-selected="false" data-tab="lab" id="tab-lab">Lab &amp; results</button>
+  </nav>
+
+  <section class="tab" id="watch" role="tabpanel" aria-labelledby="tab-watch">
+    <div class="controls">
+      <label for="wField">Opponents
+        <select id="wField"><option value="house">Deep-ML house bots</option><option value="ai">AI-written contest bots</option></select></label>
+      <label for="wSeed">Deal seed <input type="number" id="wSeed" value="7" min="0"></label>
+      <label for="wSpeed">Speed
+        <select id="wSpeed"><option value="700">Slow</option><option value="250" selected>Normal</option><option value="60">Fast</option><option value="5">Turbo</option></select></label>
+      <button class="btn primary" id="wStart" disabled>Deal a tournament</button>
+      <button class="btn" id="wPause" disabled>Pause</button>
+      <button class="btn" id="wSkip" disabled>Next hand</button>
+      <button class="btn" id="wEnd" disabled>Skip to end</button>
+    </div>
+    <div class="arena">
+      <div>
+        <div class="table-box" id="wTable"></div>
+        <div class="result" id="wResult" hidden></div>
+      </div>
+      <div class="side">
+        <div class="panel"><h3>Standings</h3><table class="std" id="wStand"></table></div>
+        <div class="panel"><h3>Chip stacks</h3><svg class="graph" id="wGraph" viewBox="0 0 300 170" preserveAspectRatio="none" role="img" aria-label="Chip stacks over hands"></svg></div>
+        <div class="panel"><h3>Hand log</h3><div class="log" id="wLog"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="tab" id="play" role="tabpanel" aria-labelledby="tab-play" hidden>
+    <div class="controls">
+      <label for="pMode">Table
+        <select id="pMode"><option value="hu">Heads-up vs VT-Bot</option><option value="table">8-max: you, VT-Bot and 6 house bots</option></select></label>
+      <label for="pSeed">Deal seed <input type="number" id="pSeed" value="1" min="0"></label>
+      <button class="btn primary" id="pStart" disabled>Sit down</button>
+    </div>
+    <div class="arena">
+      <div>
+        <div class="table-box" id="pTable"></div>
+        <div class="actionbar" id="pBar">
+          <button class="btn danger" id="aFold" disabled>Fold</button>
+          <button class="btn" id="aCall" disabled>Check</button>
+          <div class="grow">
+            <input type="range" id="aSlider" min="0" max="0" value="0" disabled aria-label="Raise amount">
+            <div class="presets">
+              <button class="btn" data-frac="0.5" disabled>½ pot</button>
+              <button class="btn" data-frac="1" disabled>Pot</button>
+              <button class="btn" data-frac="all" disabled>All-in</button>
+            </div>
+          </div>
+          <button class="btn primary" id="aRaise" disabled>Raise</button>
+        </div>
+        <div class="status" id="pStatus">Pick a table and sit down. You start with 2,000 chips; blinds rise every 25 hands.</div>
+        <div class="result" id="pResult" hidden></div>
+      </div>
+      <div class="side">
+        <div class="panel"><h3>Standings</h3><table class="std" id="pStand"></table></div>
+        <div class="panel"><h3>Hand log</h3><div class="log" id="pLog"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="tab" id="lab" role="tabpanel" aria-labelledby="tab-lab" hidden>
+    <div class="lab" id="labRoot"></div>
+  </section>
+
+  <footer>Built by Vaibhaav Tiwari for Deep-ML's No Limit: Pokerbot Tournament (Nov 2026). Engine, bot and opponents are plain Python, executed in the browser with Pyodide. <a href="https://github.com/Vaibhaav-Tiwari/pokerbot-arena">Source and full write-up on GitHub</a>.</footer>
+</div>
+<script src="app.js"></script>
+</body>
+</html>

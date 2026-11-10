@@ -1,0 +1,21 @@
+{
+ "open_pct": 0.3227946308621932,
+ "open_late_bonus": 0.2809560807238154,
+ "open_size": 2.5,
+ "threebet_pct": 0.021693794728957314,
+ "call_raise_pct": 0.06,
+ "push_bb": 6.0,
+ "push_base": 0.1,
+ "push_exp": 1.1756221936003124,
+ "push_late_mult": 1.5817735067907703,
+ "call_allin_pct": 0.05130886804725242,
+ "bubble_tighten": 1.0,
+ "maniac_widen": 2.3497102506364573,
+ "maniac_rate": 0.09066131212614308,
+ "bet_eq": 0.5717437110511481,
+ "raise_eq": 0.7307361585221638,
+ "call_margin": 0.0133772351619759,
+ "icm_margin": 0.1239007596906442,
+ "value_frac": 1.2,
+ "cbet": 0.5682836264574865
+}
