@@ -8,11 +8,12 @@ let nextGame = 1;
 
 async function boot() {
   postMessage({ type: "progress", text: "Loading Python runtime…" });
+  // Fetch the bot's files (one bundle) while the runtime downloads, not after.
+  const bundleP = fetch("py/bundle.json").then((r) => r.json());
   py = await loadPyodide({ indexURL: "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/" });
-  const files = await (await fetch("py/manifest.json")).json();
-  postMessage({ type: "progress", text: `Loading the bot (${files.length} files)…` });
-  for (const f of files) {
-    const text = await (await fetch("py/" + f)).text();
+  postMessage({ type: "progress", text: "Loading the bot…" });
+  const bundle = await bundleP;
+  for (const [f, text] of Object.entries(bundle)) {
     const dir = (APP + "/" + f).split("/").slice(0, -1).join("/");
     py.FS.mkdirTree(dir);
     py.FS.writeFile(APP + "/" + f, text);

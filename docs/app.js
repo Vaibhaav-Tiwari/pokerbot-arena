@@ -3,12 +3,14 @@
 const worker = new Worker("worker.js");
 const pending = new Map();
 let rpcId = 0;
+let engineReady = false;
 const bootEl = document.getElementById("boot");
 const bootText = document.getElementById("bootText");
 worker.onmessage = (e) => {
   const m = e.data;
   if (m.type === "progress") { bootText.textContent = m.text; return; }
   if (m.type === "ready") {
+    engineReady = true;
     bootEl.classList.add("ok");
     bootText.textContent = "Python engine ready. Deal a tournament or sit down at a table.";
     document.querySelectorAll("#wStart, #pStart").forEach((b) => (b.disabled = false));
@@ -236,7 +238,7 @@ function drawGraph(svg, T) {
     const myRun = run;
     $("wLog").textContent = "Dealing… (a full tournament takes a moment to simulate)";
     try {
-      data = await rpc("watch", { seed: +$("wSeed").value || 0, field: $("wField").value });
+      data = await getReplay(+$("wSeed").value || 0, $("wField").value);
     } catch (e) { $("wLog").textContent = "Error: " + e.message; startB.disabled = false; return; }
     if (myRun !== run) return;
     T.setup(data.names, data.hero, { hero: data.hero, you: -1, revealAll: true });
@@ -256,7 +258,19 @@ function drawGraph(svg, T) {
     while (idx < events.length) T.apply(events[idx++], true);
     finish();
   });
-  $("wSeed").addEventListener("change", () => {});
+  // Seeds 0–24 are pre-recorded (docs/replays/, same code as the live engine), so Watch works
+  // before Python has loaded. Other seeds are simulated live once the engine is ready.
+  const replays = fetch("replays/index.json").then((r) => r.json()).catch(() => null);
+  async function getReplay(seed, field) {
+    const idx = await replays;
+    if (idx && idx.seeds.includes(seed) && idx.fields.includes(field)) {
+      const r = await fetch(`replays/${field}-${seed}.json`);
+      if (r.ok) return r.json();
+    }
+    if (!engineReady) throw new Error(`Seed ${seed} needs the Python engine, which is still loading. Seeds 0–24 play instantly.`);
+    return rpc("watch", { seed, field });
+  }
+  replays.then((idx) => { if (idx && !engineReady) startB.disabled = false; });
 })();
 
 // ---------- play ----------
